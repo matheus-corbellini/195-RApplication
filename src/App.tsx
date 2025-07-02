@@ -9,7 +9,7 @@ import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
 import Dashboard from "./components/Dashboard";
 import { useAuth } from "./hooks/useAuth";
-import "./App.css";
+import "./styles/App.css";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {

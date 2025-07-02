@@ -1,10 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import "./Dashboard.css";
+import "../styles/Dashboard.css";
 
 const Dashboard: React.FC = () => {
-  const { currentUser, logout } = useAuth();
+  const { userData, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -23,7 +23,7 @@ const Dashboard: React.FC = () => {
           <h2>RApplication</h2>
         </div>
         <div className="nav-user">
-          <span>Olá, {currentUser?.email}</span>
+          <span>Olá, {userData?.name}</span>
           <button onClick={handleLogout} className="logout-button">
             Sair
           </button>
@@ -32,8 +32,8 @@ const Dashboard: React.FC = () => {
 
       <main className="dashboard-main">
         <div className="dashboard-header">
-          <h1>Dashboard</h1>
-          <p>Bem-vindo ao seu painel de controle!</p>
+          <h1>RApplication crematório</h1>
+          <p>Descubra o que podemos fazer por você!</p>
         </div>
 
         <div className="dashboard-content">

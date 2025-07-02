@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import "./AuthPages.css";
+import "../styles/AuthPages.css";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../firebaseconfig";
+import { updateProfile } from "firebase/auth";
+import type { User as AppUser } from "../type/user";
 
 const EyeIcon = ({ visible }: { visible: boolean }) =>
   visible ? (
@@ -63,12 +65,14 @@ const RegisterPage: React.FC = () => {
       setLoading(true);
       const userCredential = await signup(email, password);
       const user = userCredential.user;
-      await setDoc(doc(db, "users", user.uid), {
+      await updateProfile(user, { displayName: name });
+      const userData: AppUser = {
         uid: user.uid,
         name: name,
-        email: user.email,
+        email: user.email!,
         createdAt: new Date(),
-      });
+      };
+      await setDoc(doc(db, "users", user.uid), userData);
       navigate("/dashboard"); // Redireciona para dashboard após registro
     } catch (error: unknown) {
       setError("Falha no registro. Tente novamente.");

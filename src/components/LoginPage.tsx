@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import "./AuthPages.css";
+import "../styles/AuthPages.css";
 
 const EyeIcon = ({ visible }: { visible: boolean }) =>
   visible ? (

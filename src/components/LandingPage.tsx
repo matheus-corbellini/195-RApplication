@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./LandingPage.css";
+import "../styles/LandingPage.css";
+import { Footer } from "borderless";
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -62,7 +63,7 @@ const LandingPage: React.FC = () => {
       </div>
 
       <div className="landing-footer">
-        <p>&copy; RApplication. Todos os direitos reservados.</p>
+        <Footer theme="light" backgroundColor="transparent" />
       </div>
     </div>
   );
