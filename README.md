@@ -1,69 +1,93 @@
-# React + TypeScript + Vite
+# RApplication
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Uma aplicação React moderna com autenticação Firebase e navegação completa.
 
-Currently, two official plugins are available:
+## 🚀 Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Landing Page** - Página inicial atrativa
+- **Sistema de Autenticação** - Login e registro com Firebase
+- **Dashboard** - Área protegida para usuários logados
+- **Navegação Completa** - React Router com proteção de rotas
+- **Design Responsivo** - Funciona em desktop e mobile
 
-## Expanding the ESLint configuration
+## 📁 Estrutura do Projeto
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── components/
+│   ├── LandingPage.tsx      # Página inicial
+│   ├── LoginPage.tsx        # Página de login
+│   ├── RegisterPage.tsx     # Página de registro
+│   ├── Dashboard.tsx        # Dashboard do usuário
+│   ├── ProtectedRoute.tsx   # Componente de proteção de rotas
+│   ├── LandingPage.css      # Estilos da landing page
+│   ├── AuthPages.css        # Estilos das páginas de auth
+│   └── Dashboard.css        # Estilos do dashboard
+├── contexts/
+│   ├── AuthContextDef.ts    # Definição do context de auth
+│   └── AuthContext.tsx      # Provider do context de auth
+├── hooks/
+│   └── useAuth.ts           # Hook personalizado para auth
+├── firebaseconfig.ts        # Configuração do Firebase
+└── App.tsx                  # Componente principal com rotas
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Tecnologias Utilizadas
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **React 18** - Framework principal
+- **TypeScript** - Tipagem estática
+- **React Router** - Navegação
+- **Firebase Auth** - Autenticação
+- **CSS3** - Estilização moderna
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🚀 Como Executar
+
+1. **Instalar dependências:**
+
+   ```bash
+   npm install
+   ```
+
+2. **Configurar Firebase:**
+
+   - Edite `src/firebaseconfig.ts` com suas credenciais do Firebase
+
+3. **Executar em desenvolvimento:**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Acessar:**
+   - Abra [http://localhost:5173](http://localhost:5173)
+
+## 📱 Rotas da Aplicação
+
+- `/` - Landing Page (pública)
+- `/login` - Página de Login (pública)
+- `/register` - Página de Registro (pública)
+- `/dashboard` - Dashboard (protegida - requer login)
+
+## 🔐 Sistema de Autenticação
+
+O projeto utiliza:
+
+- **Context API** para gerenciamento de estado
+- **Firebase Auth** para autenticação
+- **Protected Routes** para proteger páginas
+- **Redirecionamento automático** baseado no estado de autenticação
+
+## 🎨 Design
+
+- **Gradientes modernos** para backgrounds
+- **Animações suaves** para transições
+- **Design responsivo** para todos os dispositivos
+- **Interface intuitiva** e amigável
+
+## 📝 Próximos Passos
+
+- [ ] Adicionar mais funcionalidades ao dashboard
+- [ ] Implementar recuperação de senha
+- [ ] Adicionar validação de email
+- [ ] Implementar perfil do usuário
+- [ ] Adicionar testes unitários
