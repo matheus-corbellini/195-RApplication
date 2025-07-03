@@ -1,0 +1,116 @@
+.planos {
+  padding: 4rem 0;
+  background: white;
+}
+
+.planos h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #8b4513;
+  margin-bottom: 1rem;
+}
+
+.section-subtitle {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 3rem;
+}
+
+.planos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.plano-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plano-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.plano-card.featured {
+  border-color: #8b4513;
+  transform: scale(1.05);
+}
+
+.badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #8b4513;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.plano-header h3 {
+  font-size: 1.5rem;
+  color: #8b4513;
+  margin-bottom: 1rem;
+}
+
+.preco {
+  margin-bottom: 2rem;
+}
+
+.valor {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #8b4513;
+}
+
+.periodo {
+  font-size: 1rem;
+  color: #666;
+}
+
+.plano-features {
+  list-style: none;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.plano-features li {
+  padding: 0.5rem 0;
+  color: #666;
+}
+
+.btn-plano {
+  width: 100%;
+  background: #8b4513;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-plano:hover {
+  background-color: #a0522d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .planos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plano-card.featured {
+    transform: none;
+  }
+}

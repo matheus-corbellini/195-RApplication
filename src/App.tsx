@@ -4,10 +4,10 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import LandingPage from "./components/LandingPage";
-import LoginPage from "./components/LoginPage";
-import RegisterPage from "./components/RegisterPage";
-import Dashboard from "./components/Dashboard";
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import Dashboard from "./pages/Dashboard";
 import { useAuth } from "./hooks/useAuth";
 import "./styles/App.css";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -19,7 +19,6 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          {/* Rota pública - Landing Page */}
           <Route
             path="/"
             element={
@@ -31,7 +30,6 @@ function App() {
             }
           />
 
-          {/* Rotas de autenticação */}
           <Route
             path="/login"
             element={
@@ -49,7 +47,6 @@ function App() {
             }
           />
 
-          {/* Rota protegida - Dashboard */}
           <Route
             path="/dashboard"
             element={
@@ -59,7 +56,6 @@ function App() {
             }
           />
 
-          {/* Rota padrão - redireciona para landing page */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
