@@ -1,60 +1,65 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+"use client";
+
+import { useState } from "react";
+import Sidebar from "../components/Sidebar";
+import RegistrarAnimal from "../components/dashboard/RegistrarAnimal";
+import ComoFunciona from "../components/dashboard/ComoFunciona";
+import PorqueEscolher from "../components/dashboard/PorqueEscolher";
+import ContratarPlano from "../components/dashboard/ContratarPlano";
 import "../styles/dashboard/Dashboard.css";
+import { Menu } from "lucide-react";
 
-const Dashboard: React.FC = () => {
-  const { userData, logout } = useAuth();
-  const navigate = useNavigate();
+export default function Dashboard() {
+  const [activeSection, setActiveSection] = useState("registrar-animal");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate("/");
-    } catch (error: unknown) {
-      console.error("Erro no logout:", error);
+  const renderContent = () => {
+    switch (activeSection) {
+      case "registrar-animal":
+        return <RegistrarAnimal />;
+      case "como-funciona":
+        return <ComoFunciona />;
+      case "porque-escolher":
+        return <PorqueEscolher />;
+      case "contratar-plano":
+        return <ContratarPlano />;
+      default:
+        return <RegistrarAnimal />;
     }
   };
 
   return (
-    <div className="dashboard-container">
-      <nav className="dashboard-nav">
-        <div className="nav-brand">
-          <h2>RApplication</h2>
-        </div>
-        <div className="nav-user">
-          <span>Olá, {userData?.name}</span>
-          <button onClick={handleLogout} className="logout-button">
-            Sair
+    <div className="dashboard">
+      <Sidebar
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+        isOpen={sidebarOpen}
+        setIsOpen={setSidebarOpen}
+      />
+
+      <div className="dashboard-main">
+        <header className="dashboard-header">
+          <button
+            className="sidebar-toggle"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            <Menu size={24} />
           </button>
-        </div>
-      </nav>
-
-      <main className="dashboard-main">
-        <div className="dashboard-header">
-          <h1>RApplication crematório</h1>
-          <p>Descubra o que podemos fazer por você!</p>
-        </div>
-
-        <div className="dashboard-content">
-          <div className="dashboard-card">
-            <h3>📊 Fale conosco!</h3>
-            <p>Entre em contato conosco para mais informações.</p>
+          <div className="user-info">
+            <span>Bem-vindo, João Silva</span>
+            <div className="user-avatar">JS</div>
           </div>
+        </header>
 
-          <div className="dashboard-card">
-            <h3>📝 Tipos de cremação</h3>
-            <p>Saiba mais sobre os tipos de cremação.</p>
-          </div>
+        <main className="dashboard-content">{renderContent()}</main>
+      </div>
 
-          <div className="dashboard-card">
-            <h3>⚙️ Nosso processo</h3>
-            <p>Saiba mais sobre nosso processo.</p>
-          </div>
-        </div>
-      </main>
+      {sidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
     </div>
   );
-};
-
-export default Dashboard;
+}
