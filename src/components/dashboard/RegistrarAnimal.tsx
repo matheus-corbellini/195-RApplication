@@ -4,9 +4,14 @@ import type React from "react";
 
 import { useState } from "react";
 import "../../styles/dashboard/RegistrarAnimal.css";
+import type { Animal } from "../../type/animal";
+import { db } from "../../firebaseconfig";
+import { collection, addDoc, setDoc } from "firebase/firestore";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function RegistrarAnimal() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Animal>({
+    uid: "",
     petName: "",
     petType: "",
     breed: "",
@@ -17,7 +22,11 @@ export default function RegistrarAnimal() {
     ownerEmail: "",
     address: "",
     specialInstructions: "",
+    userId: "",
   });
+
+  const { currentUser } = useAuth();
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -31,10 +40,40 @@ export default function RegistrarAnimal() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Pet registration data:", formData);
-    alert("Animal registrado com sucesso!");
+    try {
+      const docRef = await addDoc(collection(db, "animals"), {
+        ...formData,
+        userId: currentUser?.uid || "",
+      });
+
+      await setDoc(docRef, {
+        ...formData,
+        userId: currentUser?.uid || "",
+        uid: docRef.id,
+      });
+
+      setSuccessMessage("Registro confirmado!");
+      setTimeout(() => setSuccessMessage(""), 3000);
+      setFormData({
+        uid: "",
+        petName: "",
+        petType: "",
+        breed: "",
+        age: "",
+        weight: "",
+        ownerName: "",
+        ownerPhone: "",
+        ownerEmail: "",
+        address: "",
+        specialInstructions: "",
+        userId: "",
+      });
+    } catch (error) {
+      alert("Erro ao registrar animal. Tente novamente.");
+      console.error(error);
+    }
   };
 
   return (
@@ -179,6 +218,11 @@ export default function RegistrarAnimal() {
           <button type="submit" className="btn-submit">
             Registrar Animal
           </button>
+          {successMessage && (
+            <span className="success-message" style={{ marginLeft: 16 }}>
+              {successMessage}
+            </span>
+          )}
         </div>
       </form>
     </div>

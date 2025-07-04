@@ -12,6 +12,9 @@ import {
   X,
 } from "lucide-react";
 
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
 interface SidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
@@ -53,6 +56,19 @@ export default function Sidebar({
     setIsOpen(false);
   };
 
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setTimeout(() => {
+        navigate("/landing-page");
+      }, 100);
+    } catch (error) {
+      console.error("Erro ao deslogar:", error);
+    }
+  };
   return (
     <aside className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
       <div className="sidebar-header">
@@ -89,7 +105,7 @@ export default function Sidebar({
         <Link to="/" className="back-home">
           <Home size={16} /> Voltar ao início
         </Link>
-        <button className="logout-btn">
+        <button className="logout-btn" onClick={handleLogout}>
           <LogOut size={16} /> Sair
         </button>
       </div>
