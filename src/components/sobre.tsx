@@ -1,6 +1,6 @@
 "use client";
 
-import "../styles/sobre.css";
+import "../styles/Landingpage/sobre.css";
 
 export default function Sobre() {
   const stats = [

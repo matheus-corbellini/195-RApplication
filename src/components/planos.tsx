@@ -1,6 +1,6 @@
 "use client";
 
-import "../styles/planos.css";
+import "../styles/Landingpage/planos.css";
 
 export default function Planos() {
   const planos = [
