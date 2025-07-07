@@ -1,6 +1,6 @@
 "use client";
 
-import "../styles/Sidebar.css";
+import "../../styles/Sidebar.css";
 import { Link } from "react-router-dom";
 import {
   Heart,
@@ -12,7 +12,7 @@ import {
   X,
 } from "lucide-react";
 
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
@@ -63,7 +63,7 @@ export default function Sidebar({
     try {
       await logout();
       setTimeout(() => {
-        navigate("/landing-page");
+        navigate("/login");
       }, 100);
     } catch (error) {
       console.error("Erro ao deslogar:", error);

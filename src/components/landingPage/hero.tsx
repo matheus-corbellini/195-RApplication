@@ -1,6 +1,6 @@
 "use client";
 
-import "../styles/Landingpage/hero.css";
+import "../../styles/Landingpage/hero.css";
 
 export default function Hero() {
   const scrollToSection = (sectionId: string) => {

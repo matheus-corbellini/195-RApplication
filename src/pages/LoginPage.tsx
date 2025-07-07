@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "../styles/login.css";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useAuth } from "../hooks/useAuth";
@@ -16,7 +16,6 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +31,6 @@ export default function Login() {
     setIsLoading(true);
     try {
       await login(formData.email, formData.password);
-      navigate("/dashboard");
     } catch (error) {
       alert("E-mail ou senha inválidos.");
       console.error(error);

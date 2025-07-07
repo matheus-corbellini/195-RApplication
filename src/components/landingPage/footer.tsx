@@ -1,6 +1,6 @@
 "use client";
 
-import "../styles/Landingpage/footer.css";
+import "../../styles/Landingpage/footer.css";
 
 export default function Footer() {
   const footerSections = [

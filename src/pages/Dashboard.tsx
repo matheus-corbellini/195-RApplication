@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../components/dashboard/Sidebar";
 import RegistrarAnimal from "../components/dashboard/RegistrarAnimal";
 import ComoFunciona from "../components/dashboard/ComoFunciona";
 import PorqueEscolher from "../components/dashboard/PorqueEscolher";

@@ -1,10 +1,10 @@
 "use client";
 
-import Header from "../components/header";
-import Hero from "../components/hero";
-import Planos from "../components/planos";
-import Sobre from "../components/sobre";
-import Footer from "../components/footer";
+import Header from "../components/landingPage/header";
+import Hero from "../components/landingPage/hero";
+import Planos from "../components/landingPage/planos";
+import Sobre from "../components/landingPage/sobre";
+import Footer from "../components/landingPage/footer";
 import { Footer as BorderlessFooter } from "borderless";
 import "../styles/index.css";
 
