@@ -1,85 +1,63 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Filter,
   Calendar,
-  Clock,
-  MapPin,
-  Phone,
   Plus,
   CheckCircle,
   XCircle,
 } from "lucide-react";
 import "../../styles/admin/Agendamento.css";
+import { db } from "../../firebaseconfig";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import type { Agendamento, AgendamentoComNomes } from "../../type/agendamento";
 
 export default function Agendamento() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
+  const [appointments, setAppointments] = useState<AgendamentoComNomes[]>([]);
 
-  const appointments = [
-    {
-      id: "AGD001",
-      cliente: "João Silva",
-      pet: "Luna",
-      tipo: "Cão",
-      data: "16/12/2024",
-      horario: "14:00",
-      endereco: "Rua das Flores, 123 - São Paulo",
-      telefone: "(11) 99999-1111",
-      status: "agendado",
-      observacoes: "Pet de grande porte, cuidado especial",
-    },
-    {
-      id: "AGD002",
-      cliente: "Maria Santos",
-      pet: "Mimi",
-      tipo: "Gato",
-      data: "17/12/2024",
-      horario: "10:30",
-      endereco: "Av. Paulista, 456 - São Paulo",
-      telefone: "(11) 99999-2222",
-      status: "confirmado",
-      observacoes: "Coleta em clínica veterinária",
-    },
-    {
-      id: "AGD003",
-      cliente: "Carlos Oliveira",
-      pet: "Rex",
-      tipo: "Cão",
-      data: "15/12/2024",
-      horario: "16:00",
-      endereco: "Rua do Campo, 789 - São Paulo",
-      telefone: "(11) 99999-3333",
-      status: "concluido",
-      observacoes: "Cremação realizada com sucesso",
-    },
-    {
-      id: "AGD004",
-      cliente: "Ana Costa",
-      pet: "Bella",
-      tipo: "Cão",
-      data: "18/12/2024",
-      horario: "09:00",
-      endereco: "Rua da Paz, 321 - São Paulo",
-      telefone: "(11) 99999-4444",
-      status: "pendente",
-      observacoes: "Aguardando confirmação do cliente",
-    },
-    {
-      id: "AGD005",
-      cliente: "Pedro Lima",
-      pet: "Whiskers",
-      tipo: "Gato",
-      data: "14/12/2024",
-      horario: "11:00",
-      endereco: "Av. Brasil, 654 - São Paulo",
-      telefone: "(11) 99999-5555",
-      status: "cancelado",
-      observacoes: "Cancelado pelo cliente",
-    },
-  ];
+  useEffect(() => {
+    async function fetchAgendamentos() {
+      const querySnapshot = await getDocs(collection(db, "agendamentos"));
+      const lista: Agendamento[] = [];
+      querySnapshot.forEach((docSnap) => {
+        lista.push({
+          id: docSnap.id,
+          ...(docSnap.data() as Omit<Agendamento, "id">),
+        });
+      });
+
+      const enriched = await Promise.all(
+        lista.map(async (agendamento) => {
+          let animalNome = "";
+          let usuarioNome = "";
+
+          if (agendamento.animalId) {
+            const animalDoc = await getDoc(
+              doc(db, "animals", agendamento.animalId)
+            );
+            animalNome = animalDoc.exists()
+              ? animalDoc.data().petName || ""
+              : "";
+          }
+
+          if (agendamento.userId) {
+            const userDoc = await getDoc(doc(db, "users", agendamento.userId));
+            usuarioNome = userDoc.exists()
+              ? userDoc.data().name || userDoc.data().nome || ""
+              : "";
+          }
+          return { ...agendamento, animalNome, usuarioNome };
+        })
+      );
+
+      setAppointments(enriched);
+    }
+    fetchAgendamentos();
+  }, []);
 
   const stats = [
     {
@@ -106,9 +84,9 @@ export default function Agendamento() {
 
   const filteredAppointments = appointments.filter((appointment) => {
     const matchesSearch =
-      appointment.cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.pet.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.id.toLowerCase().includes(searchTerm.toLowerCase());
+      appointment.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.animalId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.userId.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
       statusFilter === "todos" || appointment.status === statusFilter;
@@ -151,7 +129,7 @@ export default function Agendamento() {
           <Search size={20} />
           <input
             type="text"
-            placeholder="Buscar por cliente, pet ou ID..."
+            placeholder="Buscar por ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -182,50 +160,28 @@ export default function Agendamento() {
             <div className="card-header">
               <div className="appointment-id">{appointment.id}</div>
               <span className={`status ${appointment.status}`}>
-                {appointment.status === "pendente"
-                  ? "Pendente"
-                  : appointment.status === "agendado"
-                  ? "Agendado"
-                  : appointment.status === "confirmado"
-                  ? "Confirmado"
-                  : appointment.status === "concluido"
-                  ? "Concluído"
-                  : "Cancelado"}
+                {appointment.status}
               </span>
             </div>
 
             <div className="card-content">
               <div className="client-info">
-                <h3>{appointment.cliente}</h3>
+                <h3>{appointment.usuarioNome || appointment.userId}</h3>
                 <p className="pet-info">
-                  <strong>{appointment.pet}</strong> - {appointment.tipo}
+                  <strong>
+                    {appointment.animalNome || appointment.animalId}
+                  </strong>
                 </p>
               </div>
 
               <div className="appointment-details">
                 <div className="detail-item">
                   <Calendar size={16} />
-                  <span>{appointment.data}</span>
-                </div>
-                <div className="detail-item">
-                  <Clock size={16} />
-                  <span>{appointment.horario}</span>
-                </div>
-                <div className="detail-item">
-                  <MapPin size={16} />
-                  <span>{appointment.endereco}</span>
-                </div>
-                <div className="detail-item">
-                  <Phone size={16} />
-                  <span>{appointment.telefone}</span>
+                  <span>
+                    {new Date(appointment.dataHora).toLocaleString("pt-BR")}
+                  </span>
                 </div>
               </div>
-
-              {appointment.observacoes && (
-                <div className="observations">
-                  <strong>Observações:</strong> {appointment.observacoes}
-                </div>
-              )}
             </div>
 
             <div className="card-actions">

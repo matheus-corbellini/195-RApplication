@@ -6,6 +6,7 @@ import RegistrarAnimal from "../components/dashboard/RegistrarAnimal";
 import ComoFunciona from "../components/dashboard/ComoFunciona";
 import PorqueEscolher from "../components/dashboard/PorqueEscolher";
 import ContratarPlano from "../components/dashboard/ContratarPlano";
+import AgendarServico from "../components/dashboard/AgendarServico";
 import "../styles/dashboard/Dashboard.css";
 import { Menu } from "lucide-react";
 
@@ -23,6 +24,8 @@ export default function Dashboard() {
         return <PorqueEscolher />;
       case "contratar-plano":
         return <ContratarPlano />;
+      case "agendar-servico":
+        return <AgendarServico />;
       default:
         return <RegistrarAnimal />;
     }

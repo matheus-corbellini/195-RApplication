@@ -10,6 +10,7 @@ import {
   Home,
   LogOut,
   X,
+  Calendar,
 } from "lucide-react";
 
 import { useAuth } from "../../hooks/useAuth";
@@ -33,6 +34,11 @@ export default function Sidebar({
       id: "registrar-animal",
       label: "Registre seu Animal",
       icon: <Heart size={20} />,
+    },
+    {
+      id: "agendar-servico",
+      label: "Agendar Serviço",
+      icon: <Calendar size={20} />,
     },
     {
       id: "como-funciona",

@@ -1,0 +1,89 @@
+.agendar-servico-container {
+  max-width: 480px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(139, 69, 19, 0.08);
+  padding: 32px 28px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.agendar-servico-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.agendar-servico-form label {
+  font-weight: 600;
+  color: #8b4513;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.agendar-servico-form select,
+.agendar-servico-form input,
+.agendar-servico-form .react-datepicker-wrapper {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #faf8f6;
+  margin-top: 4px;
+  margin-bottom: 2px;
+  box-sizing: border-box;
+  outline: none;
+  border: none;
+}
+
+.agendar-servico-form .react-datepicker-wrapper {
+  padding: 0;
+}
+
+.agendar-servico-form button[type="submit"] {
+  background: #8b4513;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.agendar-servico-form button[type="submit"]:hover {
+  background: #a0522d;
+}
+
+.agendar-servico-form button[disabled] {
+  background: #cfcfcf;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.agendar-servico-form p {
+  margin-top: 12px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.agendar-servico-form p {
+  color: #8b4513;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .agendar-servico-container {
+    padding: 18px 6px 18px 6px;
+    max-width: 98vw;
+  }
+  .agendar-servico-form {
+    gap: 14px;
+  }
+}
