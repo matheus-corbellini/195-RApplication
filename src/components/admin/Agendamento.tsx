@@ -11,7 +11,13 @@ import {
 } from "lucide-react";
 import "../../styles/admin/Agendamento.css";
 import { db } from "../../firebaseconfig";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  Timestamp,
+} from "firebase/firestore";
 import type { Agendamento, AgendamentoComNomes } from "../../type/agendamento";
 
 export default function Agendamento() {
@@ -59,28 +65,16 @@ export default function Agendamento() {
     fetchAgendamentos();
   }, []);
 
-  const stats = [
-    {
-      title: "Agendamentos Hoje",
-      value: "8",
-      color: "#8b4513",
-    },
-    {
-      title: "Pendentes",
-      value: "12",
-      color: "#ffc107",
-    },
-    {
-      title: "Confirmados",
-      value: "15",
-      color: "#28a745",
-    },
-    {
-      title: "Concluídos",
-      value: "127",
-      color: "#17a2b8",
-    },
-  ];
+  const totalAgendamentos = appointments.length;
+  const totalPendentes = appointments.filter(
+    (a) => a.status === "pendente"
+  ).length;
+  const totalConfirmados = appointments.filter(
+    (a) => a.status === "confirmado"
+  ).length;
+  const totalConcluidos = appointments.filter(
+    (a) => a.status === "concluido"
+  ).length;
 
   const filteredAppointments = appointments.filter((appointment) => {
     const matchesSearch =
@@ -103,6 +97,25 @@ export default function Agendamento() {
     }
   };
 
+  function formatDate(date: unknown) {
+    if (!date) return "-";
+    if (typeof date === "string") {
+      const d = new Date(date);
+      return isNaN(d.getTime()) ? "-" : d.toLocaleString("pt-BR");
+    }
+    if (date instanceof Date) return date.toLocaleString("pt-BR");
+    if (
+      typeof date === "object" &&
+      date !== null &&
+      "toDate" in date &&
+      typeof (date as Timestamp).toDate === "function"
+    ) {
+      const d = (date as Timestamp).toDate();
+      return d.toLocaleString("pt-BR");
+    }
+    return "-";
+  }
+
   return (
     <div className="agendamento-cremacoes">
       <div className="page-header">
@@ -114,14 +127,30 @@ export default function Agendamento() {
       </div>
 
       <div className="stats-grid">
-        {stats.map((stat, index) => (
-          <div key={index} className="stat-card">
-            <div className="stat-content">
-              <h3 style={{ color: stat.color }}>{stat.value}</h3>
-              <p>{stat.title}</p>
-            </div>
+        <div className="stat-card">
+          <div className="stat-content">
+            <h3 style={{ color: "#8b4513" }}>{totalAgendamentos}</h3>
+            <p>Total de Agendamentos</p>
           </div>
-        ))}
+        </div>
+        <div className="stat-card">
+          <div className="stat-content">
+            <h3 style={{ color: "#fbc02d" }}>{totalPendentes} </h3>
+            <p>Pendentes</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-content">
+            <h3 style={{ color: "#28a745" }}>{totalConfirmados} </h3>
+            <p>Confirmados</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-content">
+            <h3 style={{ color: "#17a2b8" }}>{totalConcluidos} </h3>
+            <p>Concluídos</p>
+          </div>
+        </div>
       </div>
 
       <div className="filters-section">
@@ -177,9 +206,7 @@ export default function Agendamento() {
               <div className="appointment-details">
                 <div className="detail-item">
                   <Calendar size={16} />
-                  <span>
-                    {new Date(appointment.dataHora).toLocaleString("pt-BR")}
-                  </span>
+                  <span>{formatDate(appointment.dataHora)}</span>
                 </div>
               </div>
             </div>

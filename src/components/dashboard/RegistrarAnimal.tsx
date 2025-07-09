@@ -9,7 +9,11 @@ import { db } from "../../firebaseconfig";
 import { collection, addDoc, setDoc } from "firebase/firestore";
 import { useAuth } from "../../hooks/useAuth";
 
-export default function RegistrarAnimal() {
+type RegistrarAnimalProps = {
+  onSuccess: () => void;
+};
+
+export default function RegistrarAnimal({ onSuccess }: RegistrarAnimalProps) {
   const [formData, setFormData] = useState<Animal>({
     uid: "",
     petName: "",
@@ -70,6 +74,9 @@ export default function RegistrarAnimal() {
         specialInstructions: "",
         userId: "",
       });
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       alert("Erro ao registrar animal. Tente novamente.");
       console.error(error);

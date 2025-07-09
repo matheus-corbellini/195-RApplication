@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Filter,
@@ -13,98 +13,58 @@ import {
   UserX,
 } from "lucide-react";
 import "../../styles/admin/ClientesRegistrados.css";
+import { db } from "../../firebaseconfig";
+import { collection, getDocs, Timestamp } from "firebase/firestore";
+import type { User } from "../../type/user";
 
 export default function ClientesRegistrados() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
 
-  const clients = [
-    {
-      id: "CLI001",
-      nome: "João Silva",
-      email: "joao.silva@email.com",
-      telefone: "(11) 99999-1111",
-      plano: "Premium",
-      status: "ativo",
-      dataRegistro: "15/10/2024",
-      ultimoAcesso: "14/12/2024",
-      pets: 2,
-    },
-    {
-      id: "CLI002",
-      nome: "Maria Santos",
-      email: "maria.santos@email.com",
-      telefone: "(11) 99999-2222",
-      plano: "Básico",
-      status: "ativo",
-      dataRegistro: "22/09/2024",
-      ultimoAcesso: "13/12/2024",
-      pets: 1,
-    },
-    {
-      id: "CLI003",
-      nome: "Carlos Oliveira",
-      email: "carlos.oliveira@email.com",
-      telefone: "(11) 99999-3333",
-      plano: "Família",
-      status: "inativo",
-      dataRegistro: "05/08/2024",
-      ultimoAcesso: "01/12/2024",
-      pets: 3,
-    },
-    {
-      id: "CLI004",
-      nome: "Ana Costa",
-      email: "ana.costa@email.com",
-      telefone: "(11) 99999-4444",
-      plano: "Premium",
-      status: "ativo",
-      dataRegistro: "18/11/2024",
-      ultimoAcesso: "15/12/2024",
-      pets: 1,
-    },
-    {
-      id: "CLI005",
-      nome: "Pedro Lima",
-      email: "pedro.lima@email.com",
-      telefone: "(11) 99999-5555",
-      plano: "Básico",
-      status: "suspenso",
-      dataRegistro: "30/07/2024",
-      ultimoAcesso: "10/11/2024",
-      pets: 1,
-    },
-  ];
+  const [users, setUsers] = useState<User[]>([]);
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const querySnapshot = await getDocs(collection(db, "users"));
+      const usersList: User[] = querySnapshot.docs.map(
+        (doc) => doc.data() as User
+      );
+      setUsers(usersList);
+    };
+    fetchUsers();
+  }, []);
+
+  const totalUsers = users.length;
+  const totalActiveUsers = 1089;
+  const totalInactiveUsers = 158;
   const stats = [
     {
       title: "Total de Clientes",
-      value: "1,247",
+      value: totalUsers,
       icon: <Users size={24} />,
       color: "#8b4513",
     },
     {
       title: "Clientes Ativos",
-      value: "1,089",
+      value: totalActiveUsers,
       icon: <UserCheck size={24} />,
       color: "#28a745",
     },
     {
       title: "Clientes Inativos",
-      value: "158",
+      value: totalInactiveUsers,
       icon: <UserX size={24} />,
       color: "#dc3545",
     },
   ];
 
-  const filteredClients = clients.filter((client) => {
+  const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      client.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchTerm.toLowerCase());
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.uid.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus =
-      statusFilter === "todos" || client.status === statusFilter;
+    const matchesStatus = statusFilter === "todos";
     return matchesSearch && matchesStatus;
   });
 
@@ -121,6 +81,25 @@ export default function ClientesRegistrados() {
       alert(`Cliente ${id} excluído!`);
     }
   };
+
+  function formatDate(date: unknown) {
+    if (!date) return "-";
+    if (typeof date === "string") {
+      const d = new Date(date);
+      return isNaN(d.getTime()) ? "-" : d.toLocaleDateString("pt-BR");
+    }
+    if (date instanceof Date) return date.toLocaleDateString("pt-BR");
+    if (
+      typeof date === "object" &&
+      date !== null &&
+      "toDate" in date &&
+      typeof (date as Timestamp).toDate === "function"
+    ) {
+      const d = (date as Timestamp).toDate();
+      return d.toLocaleDateString("pt-BR");
+    }
+    return "-";
+  }
 
   return (
     <div className="clientes-registrados">
@@ -185,52 +164,44 @@ export default function ClientesRegistrados() {
               <th>Plano</th>
               <th>Status</th>
               <th>Pets</th>
-              <th>Último Acesso</th>
+              <th>Data de Cadastro</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
-            {filteredClients.map((client) => (
-              <tr key={client.id}>
-                <td className="client-id">{client.id}</td>
-                <td className="client-name">{client.nome}</td>
-                <td>{client.email}</td>
-                <td>{client.telefone}</td>
+            {filteredUsers.map((user) => (
+              <tr key={user.uid}>
+                <td className="client-id">{user.uid}</td>
+                <td className="client-name">{user.name}</td>
+                <td>{user.email}</td>
+                <td>-</td>
                 <td>
-                  <span className={`plano ${client.plano.toLowerCase()}`}>
-                    {client.plano}
-                  </span>
+                  <span className="plano">-</span>
                 </td>
                 <td>
-                  <span className={`status ${client.status}`}>
-                    {client.status === "ativo"
-                      ? "Ativo"
-                      : client.status === "inativo"
-                      ? "Inativo"
-                      : "Suspenso"}
-                  </span>
+                  <span className="status">-</span>
                 </td>
-                <td className="pets-count">{client.pets}</td>
-                <td>{client.ultimoAcesso}</td>
+                <td className="pets-count">-</td>
+                <td>{formatDate(user.createdAt)}</td>
                 <td>
                   <div className="action-buttons">
                     <button
                       className="btn-view"
-                      onClick={() => handleViewClient(client.id)}
+                      onClick={() => handleViewClient(user.uid)}
                       title="Visualizar"
                     >
                       <Eye size={16} />
                     </button>
                     <button
                       className="btn-edit"
-                      onClick={() => handleEditClient(client.id)}
+                      onClick={() => handleEditClient(user.uid)}
                       title="Editar"
                     >
                       <Edit size={16} />
                     </button>
                     <button
                       className="btn-delete"
-                      onClick={() => handleDeleteClient(client.id)}
+                      onClick={() => handleDeleteClient(user.uid)}
                       title="Excluir"
                     >
                       <Trash2 size={16} />
@@ -243,7 +214,7 @@ export default function ClientesRegistrados() {
         </table>
       </div>
 
-      {filteredClients.length === 0 && (
+      {filteredUsers.length === 0 && (
         <div className="empty-state">
           <p>Nenhum cliente encontrado com os filtros aplicados.</p>
         </div>

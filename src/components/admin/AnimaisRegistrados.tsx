@@ -13,104 +13,47 @@ import {
   Cat,
 } from "lucide-react";
 import "../../styles/admin/AnimaisRegistrados.css";
+import type { Animal } from "../../type/animal";
+import { db } from "../../firebaseconfig";
+import { collection, getDocs } from "firebase/firestore";
+import { useEffect } from "react";
+import RegistrarAnimal from "../dashboard/RegistrarAnimal";
 
 export default function AnimaisRegistrados() {
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("todos");
+  const [showRegister, setShowRegister] = useState(false);
 
-  const animals = [
-    {
-      id: "PET001",
-      nome: "Luna",
-      tipo: "Cão",
-      raca: "Golden Retriever",
-      idade: "8 anos",
-      peso: "28 kg",
-      proprietario: "João Silva",
-      status: "ativo",
-      dataRegistro: "15/10/2024",
-      ultimaVisita: "14/12/2024",
-    },
-    {
-      id: "PET002",
-      nome: "Mimi",
-      tipo: "Gato",
-      raca: "Persa",
-      idade: "5 anos",
-      peso: "4 kg",
-      proprietario: "Maria Santos",
-      status: "ativo",
-      dataRegistro: "22/09/2024",
-      ultimaVisita: "10/12/2024",
-    },
-    {
-      id: "PET003",
-      nome: "Rex",
-      tipo: "Cão",
-      raca: "Pastor Alemão",
-      idade: "12 anos",
-      peso: "35 kg",
-      proprietario: "Carlos Oliveira",
-      status: "falecido",
-      dataRegistro: "05/08/2024",
-      ultimaVisita: "01/12/2024",
-    },
-    {
-      id: "PET004",
-      nome: "Bella",
-      tipo: "Cão",
-      raca: "Labrador",
-      idade: "6 anos",
-      peso: "25 kg",
-      proprietario: "Ana Costa",
-      status: "ativo",
-      dataRegistro: "18/11/2024",
-      ultimaVisita: "15/12/2024",
-    },
-    {
-      id: "PET005",
-      nome: "Whiskers",
-      tipo: "Gato",
-      raca: "Siamês",
-      idade: "10 anos",
-      peso: "5 kg",
-      proprietario: "Pedro Lima",
-      status: "falecido",
-      dataRegistro: "30/07/2024",
-      ultimaVisita: "05/11/2024",
-    },
-  ];
+  const [animals, setAnimals] = useState<Animal[]>([]);
 
-  const stats = [
-    {
-      title: "Total de Animais",
-      value: "2,847",
-      icon: <Heart size={24} />,
-      color: "#8b4513",
-    },
-    {
-      title: "Cães Registrados",
-      value: "1,689",
-      icon: <Dog size={24} />,
-      color: "#28a745",
-    },
-    {
-      title: "Gatos Registrados",
-      value: "1,158",
-      icon: <Cat size={24} />,
-      color: "#17a2b8",
-    },
-  ];
+  useEffect(() => {
+    const fetchAnimals = async () => {
+      const querySnapshot = await getDocs(collection(db, "animals"));
+      const animalsList: Animal[] = querySnapshot.docs.map(
+        (doc) => doc.data() as Animal
+      );
+      setAnimals(animalsList);
+    };
+    fetchAnimals();
+  }, []);
+
+  const totalAnimais = animals.length;
+  const totalCaes = animals.filter(
+    (a) =>
+      a.petType.toLowerCase() === "cão" || a.petType.toLowerCase() === "cao"
+  ).length;
+  const totalGatos = animals.filter(
+    (a) => a.petType.toLowerCase() === "gato"
+  ).length;
 
   const filteredAnimals = animals.filter((animal) => {
     const matchesSearch =
-      animal.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      animal.proprietario.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      animal.id.toLowerCase().includes(searchTerm.toLowerCase());
-
+      animal.petName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      animal.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      animal.uid.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType =
       typeFilter === "todos" ||
-      animal.tipo.toLowerCase() === typeFilter.toLowerCase();
+      animal.petType.toLowerCase() === typeFilter.toLowerCase();
     return matchesSearch && matchesType;
   });
 
@@ -130,25 +73,61 @@ export default function AnimaisRegistrados() {
 
   return (
     <div className="animais-registrados">
+      {showRegister && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button
+              className="close-modal"
+              onClick={() => setShowRegister(false)}
+            >
+              X
+            </button>
+            <RegistrarAnimal
+              onSuccess={() => {
+                setShowRegister(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
       <div className="page-header">
         <h1>Animais Registrados</h1>
-        <button className="btn-add-animal">
+        <button
+          className="btn-add-animal"
+          onClick={() => setShowRegister(true)}
+        >
           <Plus size={20} /> Novo Animal
         </button>
       </div>
 
       <div className="stats-grid">
-        {stats.map((stat, index) => (
-          <div key={index} className="stat-card">
-            <div className="stat-icon" style={{ color: stat.color }}>
-              {stat.icon}
-            </div>
-            <div className="stat-content">
-              <h3>{stat.value}</h3>
-              <p>{stat.title}</p>
-            </div>
+        <div className="stat-card">
+          <div className="stat-icon" style={{ color: "#8b4513" }}>
+            <Heart size={24} />
           </div>
-        ))}
+          <div className="stat-content">
+            <h3>{totalAnimais}</h3>
+            <p>Total de Animais</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon" style={{ color: "#28a745" }}>
+            <Dog size={24} />
+          </div>
+          <div className="stat-content">
+            <h3>{totalCaes}</h3>
+            <p>Cães Registrados</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon" style={{ color: "#17a2b8" }}>
+            <Cat size={24} />
+          </div>
+          <div className="stat-content">
+            <h3>{totalGatos}</h3>
+            <p>Gatos Registrados</p>
+          </div>
+        </div>
       </div>
 
       <div className="filter-controls">
@@ -189,55 +168,53 @@ export default function AnimaisRegistrados() {
               <th>Idade</th>
               <th>Peso</th>
               <th>Proprietário</th>
-              <th>Status</th>
-              <th>Última Visita</th>
+              <th>Telefone</th>
+              <th>Email</th>
+              <th>Endereço</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             {filteredAnimals.map((animal) => (
-              <tr key={animal.id}>
-                <td className="animal-id">{animal.id}</td>
-                <td className="animal-name">{animal.nome}</td>
+              <tr key={animal.uid}>
+                <td className="animal-id">{animal.uid}</td>
+                <td className="animal-name">{animal.petName}</td>
                 <td>
                   <div className="animal-type">
-                    {animal.tipo === "Cão" ? (
+                    {animal.petType === "Cão" ? (
                       <Dog size={16} />
                     ) : (
                       <Cat size={16} />
                     )}
-                    {animal.tipo}
+                    {animal.petType}
                   </div>
                 </td>
-                <td>{animal.raca}</td>
-                <td>{animal.idade}</td>
-                <td>{animal.peso}</td>
-                <td>{animal.proprietario}</td>
-                <td>
-                  <span className={`status ${animal.status}`}>
-                    {animal.status === "ativo" ? "Ativo" : "Falecido"}
-                  </span>
-                </td>
-                <td>{animal.ultimaVisita}</td>
+                <td>{animal.breed}</td>
+                <td>{animal.age}</td>
+                <td>{animal.weight}</td>
+                <td>{animal.ownerName}</td>
+                <td>{animal.ownerPhone}</td>
+                <td>{animal.ownerEmail}</td>
+                <td>{animal.address}</td>
                 <td>
                   <div className="action-buttons">
                     <button
                       className="btn-view"
-                      onClick={() => handleViewAnimal(animal.id)}
+                      onClick={() => handleViewAnimal(animal.uid)}
                       title="Visualizar"
                     >
                       <Eye size={16} />
                     </button>
                     <button
                       className="btn-edit"
-                      onClick={() => handleEditAnimal(animal.id)}
+                      onClick={() => handleEditAnimal(animal.uid)}
                       title="Editar"
                     >
                       <Edit size={16} />
                     </button>
                     <button
                       className="btn-delete"
-                      onClick={() => handleDeleteAnimal(animal.id)}
+                      onClick={() => handleDeleteAnimal(animal.uid)}
                       title="Excluir"
                     >
                       <Trash2 size={16} />
