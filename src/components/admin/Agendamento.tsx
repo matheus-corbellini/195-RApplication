@@ -13,10 +13,11 @@ import "../../styles/admin/Agendamento.css";
 import { db } from "../../firebaseconfig";
 import {
   collection,
-  getDocs,
   doc,
   getDoc,
   Timestamp,
+  updateDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import type { Agendamento, AgendamentoComNomes } from "../../type/agendamento";
 
@@ -25,9 +26,15 @@ export default function Agendamento() {
   const [statusFilter, setStatusFilter] = useState("todos");
   const [appointments, setAppointments] = useState<AgendamentoComNomes[]>([]);
 
+  // Adicionar estados para o modal de cancelamento
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [agendamentoParaCancelar, setAgendamentoParaCancelar] = useState<
+    string | null
+  >(null);
+
   useEffect(() => {
-    async function fetchAgendamentos() {
-      const querySnapshot = await getDocs(collection(db, "agendamentos"));
+    const q = collection(db, "agendamentos");
+    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       const lista: Agendamento[] = [];
       querySnapshot.forEach((docSnap) => {
         lista.push({
@@ -61,8 +68,9 @@ export default function Agendamento() {
       );
 
       setAppointments(enriched);
-    }
-    fetchAgendamentos();
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const totalAgendamentos = appointments.length;
@@ -87,14 +95,25 @@ export default function Agendamento() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleConfirmAppointment = (id: string) => {
-    alert(`Agendamento ${id} confirmado!`);
+  const handleConfirmAppointment = async (id: string) => {
+    const agendamentoRef = doc(db, "agendamentos", id);
+    await updateDoc(agendamentoRef, { status: "confirmado" });
+    // Removido setAppointments para evitar inconsistência
   };
 
+  // Substituir a função de cancelar agendamento
   const handleCancelAppointment = (id: string) => {
-    if (confirm("Tem certeza que deseja cancelar este agendamento?")) {
-      alert(`Agendamento ${id} cancelado!`);
-    }
+    setAgendamentoParaCancelar(id);
+    setShowCancelModal(true);
+  };
+
+  const confirmarCancelamento = async () => {
+    if (!agendamentoParaCancelar) return;
+    const agendamentoRef = doc(db, "agendamentos", agendamentoParaCancelar);
+    await updateDoc(agendamentoRef, { status: "cancelado" });
+    setShowCancelModal(false);
+    setAgendamentoParaCancelar(null);
+    // Removido setAppointments para evitar inconsistência
   };
 
   function formatDate(date: unknown) {
@@ -239,6 +258,22 @@ export default function Agendamento() {
       {filteredAppointments.length === 0 && (
         <div className="empty-state">
           <p>Nenhum agendamento encontrado com os filtros aplicados.</p>
+        </div>
+      )}
+
+      {showCancelModal && (
+        <div className="modal-backdrop">
+          <div className="modal">
+            <h3>Cancelar Agendamento</h3>
+            <p>Tem certeza que deseja cancelar este agendamento?</p>
+            <button
+              onClick={confirmarCancelamento}
+              style={{ marginRight: "1rem" }}
+            >
+              Confirmar
+            </button>
+            <button onClick={() => setShowCancelModal(false)}>Voltar</button>
+          </div>
         </div>
       )}
     </div>

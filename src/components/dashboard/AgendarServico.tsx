@@ -2,12 +2,22 @@ import React from "react";
 import "../../styles/dashboard/AgendarServico.css";
 import { useState, useEffect } from "react";
 import { db } from "../../firebaseconfig";
-import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  getDoc,
+  doc,
+  onSnapshot,
+} from "firebase/firestore";
 import { useAuth } from "../../hooks/useAuth";
 import type { Animal } from "../../type/animal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ptBR } from "date-fns/locale";
+import type { AgendamentoComNomes } from "../../type/agendamento";
 
 export default function AgendarServico() {
   const { currentUser } = useAuth();
@@ -17,6 +27,49 @@ export default function AgendarServico() {
   const [animalId, setAnimalId] = useState("");
   const [dataHora, setDataHora] = useState<Date | null>(null);
   const [mensagem, setMensagem] = useState("");
+
+  const [meusAgendamentos, setMeusAgendamentos] = useState<
+    AgendamentoComNomes[]
+  >([]);
+  const [loadingMeusAgendamentos, setLoadingMeusAgendamentos] = useState(true);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    setLoadingMeusAgendamentos(true);
+    const q = query(
+      collection(db, "agendamentos"),
+      where("userId", "==", currentUser.uid)
+    );
+    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+      const lista: AgendamentoComNomes[] = [];
+      for (const docSnap of querySnapshot.docs) {
+        const data = docSnap.data() as {
+          animalId: string;
+          userId: string;
+          dataHora: string;
+          status: string;
+        };
+        let animalNome = "";
+        if (data.animalId) {
+          const animalDoc = await getDoc(doc(db, "animals", data.animalId));
+          const animalData = animalDoc.data() as Animal | undefined;
+          animalNome =
+            animalDoc.exists() && animalData ? animalData.petName : "";
+        }
+        lista.push({
+          id: docSnap.id,
+          animalId: data.animalId,
+          userId: data.userId,
+          dataHora: data.dataHora,
+          status: data.status,
+          animalNome,
+        });
+      }
+      setMeusAgendamentos(lista);
+      setLoadingMeusAgendamentos(false);
+    });
+    return () => unsubscribe();
+  }, [currentUser]);
 
   useEffect(() => {
     async function fetchAnimais() {
@@ -37,6 +90,8 @@ export default function AgendarServico() {
     fetchAnimais();
   }, [currentUser]);
 
+  const [showModal, setShowModal] = useState(false);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!animalId || !dataHora) {
@@ -54,8 +109,9 @@ export default function AgendarServico() {
         dataHora: dataHora.toISOString(),
         status: "pendente",
       });
-      setMensagem("Agendamento realizado com sucesso!");
+      setMensagem("");
       setAnimalId("");
+      setShowModal(true);
       setDataHora(null);
     } catch {
       setMensagem("Erro ao agendar. Tente novamente.");
@@ -104,6 +160,52 @@ export default function AgendarServico() {
         </button>
       </form>
       {mensagem && <p>{mensagem}</p>}
+
+      <h3 style={{ marginTop: "2rem" }}>Meus Agendamentos</h3>
+      {loadingMeusAgendamentos ? (
+        <p>Carregando agendamentos...</p>
+      ) : meusAgendamentos.length === 0 ? (
+        <p>Você ainda não fez nenhum agendamento.</p>
+      ) : (
+        <div style={{ width: "100%" }}>
+          {meusAgendamentos.map((ag) => (
+            <div
+              key={ag.id}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "8px 0",
+                borderBottom: "1px solid #eee",
+                fontSize: "1rem",
+              }}
+            >
+              <span>
+                <strong>{ag.animalNome || ag.animalId}</strong>
+              </span>
+              <span>
+                {ag.dataHora
+                  ? new Date(ag.dataHora).toLocaleString("pt-BR")
+                  : "-"}
+              </span>
+              <span style={{ textTransform: "capitalize" }}>{ag.status}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {showModal && (
+        <div className="modal-backdrop">
+          <div className="modal">
+            <h3>Agendamento realizado!</h3>
+            <p>
+              Seu agendamento foi enviado e está aguardando aprovação do
+              administrador.
+            </p>
+            <button onClick={() => setShowModal(false)}>OK</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

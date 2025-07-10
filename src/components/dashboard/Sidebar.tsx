@@ -1,6 +1,6 @@
 "use client";
 
-import "../../styles/Sidebar.css";
+import "../../styles/dashboard/Sidebar.css";
 import { Link } from "react-router-dom";
 import {
   Heart,
