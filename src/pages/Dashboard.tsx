@@ -9,10 +9,20 @@ import ContratarPlano from "../components/dashboard/ContratarPlano";
 import AgendarServico from "../components/dashboard/AgendarServico";
 import "../styles/dashboard/Dashboard.css";
 import { Menu } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Dashboard() {
   const [activeSection, setActiveSection] = useState("registrar-animal");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { userData } = useAuth();
+
+  function getInitial(fullName: string | undefined) {
+    if (!fullName) return "";
+    const parts = fullName.trim().split(" ");
+    const first = parts[0]?.[0] || "";
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+    return (first + last).toUpperCase();
+  }
 
   const renderContent = () => {
     switch (activeSection) {
@@ -49,8 +59,8 @@ export default function Dashboard() {
             <Menu size={24} />
           </button>
           <div className="user-info">
-            <span>Bem-vindo, João Silva</span>
-            <div className="user-avatar">JS</div>
+            <span>Bem-vindo, {userData?.name}</span>
+            <div className="user-avatar">{getInitial(userData?.name)}</div>
           </div>
         </header>
 

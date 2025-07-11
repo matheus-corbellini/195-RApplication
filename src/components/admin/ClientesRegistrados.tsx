@@ -14,7 +14,13 @@ import {
 } from "lucide-react";
 import "../../styles/admin/ClientesRegistrados.css";
 import { db } from "../../firebaseconfig";
-import { collection, getDocs, Timestamp } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  Timestamp,
+  query,
+  where,
+} from "firebase/firestore";
 import type { User } from "../../type/user";
 
 export default function ClientesRegistrados() {
@@ -24,14 +30,24 @@ export default function ClientesRegistrados() {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchUsersAndPets = async () => {
       const querySnapshot = await getDocs(collection(db, "users"));
       const usersList: User[] = querySnapshot.docs.map(
         (doc) => doc.data() as User
       );
-      setUsers(usersList);
+
+      const usersWithPets = await Promise.all(
+        usersList.map(async (user) => {
+          const petsSnapshot = await getDocs(
+            query(collection(db, "animals"), where("userId", "==", user.uid))
+          );
+          return { ...user, petsCount: petsSnapshot.size };
+        })
+      );
+
+      setUsers(usersWithPets);
     };
-    fetchUsers();
+    fetchUsersAndPets();
   }, []);
 
   const totalUsers = users.length;
@@ -181,7 +197,7 @@ export default function ClientesRegistrados() {
                 <td>
                   <span className="status">-</span>
                 </td>
-                <td className="pets-count">-</td>
+                <td className="pets-count">{user.petsCount ?? "-"}</td>
                 <td>{formatDate(user.createdAt)}</td>
                 <td>
                   <div className="action-buttons">
