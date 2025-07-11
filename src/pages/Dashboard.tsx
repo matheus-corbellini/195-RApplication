@@ -17,7 +17,7 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (activeSection) {
       case "registrar-animal":
-        return <RegistrarAnimal />;
+        return <RegistrarAnimal onSuccess={() => {}} />;
       case "como-funciona":
         return <ComoFunciona />;
       case "porque-escolher":
@@ -27,7 +27,7 @@ export default function Dashboard() {
       case "agendar-servico":
         return <AgendarServico />;
       default:
-        return <RegistrarAnimal />;
+        return <RegistrarAnimal onSuccess={() => {}} />;
     }
   };
 
